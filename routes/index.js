@@ -80,7 +80,7 @@ router.post('/sign-in', async function(req,res,next){
       }
       
     } else {
-      error.push('email incorrect')
+      error.push('username incorrect')
     }
   }
   res.json({result, user, error})
