@@ -7,13 +7,11 @@ var options = {
 };
 
 mongoose.connect(
-  "mongodb+srv://Mgxcx:hello@cluster0.pbrbs.mongodb.net/InterviewCop?retryWrites=true&w=majority",
+  "mongodb+srv://Margaux:hello@cluster0.pbrbs.mongodb.net/InterviewCop?retryWrites=true&w=majority",
   options,
   function (err) {
     if (err) {
-      console.log(
-        `error, failed to connect to the database because --> ${err}`
-      );
+      console.log(`error, failed to connect to the database because --> ${err}`);
     } else {
       console.info("*** Database InterviewCop connection : Success ***");
     }
