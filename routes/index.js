@@ -129,6 +129,40 @@ router.post("/new-password", async function (req, res, next) {
   res.json({ result, user, error });
 });
 
+router.post("/update-userdata", async function (req, res, next) {
+  let result = false;
+  let user = null;
+  let updateUser = null;
+  let error = [];
+
+  if (req.body.jobFromFront == "" || req.body.experienceFromFront == "" || req.body.salaryFromFront == "" || req.body.countyFromFront == "") {
+    error.push("erreur: un ou plusieurs champs sont vides");
+  }
+
+  if (error.length == 0) {
+    user = await userModel.findOne({ username: req.body.usernameFromFront });
+
+    if (user) {
+      updateUser = await userModel.updateOne(
+        { username: req.body.usernameFromFront },
+        { job: req.body.jobFromFront,
+          experience:req.body.experienceFromFront,
+          salary:req.body.salaryFromFront,
+          county: req.body.countyFromFront
+         }
+      );
+      if (updateUser){
+        result = true;
+        user = await userModel.findOne({ username: req.body.usernameFromFront });   //on refait une requête à la BDD pour envoyer au front le user mis à jour 
+      }
+    } else {
+      error.push("erreur: l'enregistrement des données a échoué");
+    }
+  }
+
+  res.json({ result, error, user });
+});
+
 router.get('/generate-questions', async function(req,res,next){
   //randomization des numéros de questions 
   const indexList = [];
