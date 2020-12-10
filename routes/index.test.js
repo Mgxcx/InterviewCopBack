@@ -20,10 +20,10 @@ test("signup", async (done) => {
   await request(app)
     .post("/sign-up")
     .send({
-      usernameFromFront: "Travolta",
-      passwordFromFront: "Hello2",
+      usernameFromFront: "MikeChicken",
+      passwordFromFront: "Hello3",
       secret_question: "Quel est le nom de votre premier animal de compagnie?",
-      secret_question_answer: "John",
+      secret_question_answer: "Agent Touf",
     })
     .expect(200);
 
