@@ -7,6 +7,7 @@ var encBase64 = require("crypto-js/enc-base64");
 
 var userModel = require("../models/users");
 var questionModel = require("../models/questions");
+var trophyModel = require("../models/trophies");
 
 router.post("/sign-up", async function (req, res, next) {
   let error = [];
@@ -55,7 +56,7 @@ router.post("/sign-in", async function (req, res, next) {
   }
 
   if (error.length == 0) {
-    const user = await userModel.findOne({
+    user = await userModel.findOne({
       username: req.body.usernameFromFront,
     });
 
@@ -88,7 +89,7 @@ router.post("/password-recovery", async function (req, res, next) {
   }
 
   if (error.length == 0) {
-    const user = await userModel.findOne({
+    user = await userModel.findOne({
       username: req.body.usernameFromFront,
       secret_question: req.body.secret_questionFromFront,
       secret_question_answer: req.body.secret_question_answerFromFront,
@@ -113,7 +114,7 @@ router.post("/new-password", async function (req, res, next) {
   }
 
   if (error.length == 0) {
-    const user = await userModel.findOne({ username: req.body.usernameFromFront });
+    user = await userModel.findOne({ username: req.body.usernameFromFront });
 
     if (user) {
       await userModel.updateOne(
@@ -203,6 +204,67 @@ router.get("/generate-questions", async function (req, res, next) {
     result = true;
   }
   res.json({ result, error, questionsArray });
+});
+
+router.post("/interviewsave-scoreandtrophy", async function (req, res, next) {
+  let result = false;
+  let user = null;
+  let updateUserScore = null;
+  let updateUserTrophies = null;
+  let trophyId = "";
+  let error = [];
+
+  if (req.body.scoreFromFront == "") {
+    error.push("pas de score");
+    res.json({ result, user, error });
+  }
+
+  user = await userModel.findOne({ username: req.body.usernameFromFront });
+
+  if (user) {
+    //on fait une requête à la BDD pour trouver les scores si le user en a déjà et pusher le nouveau
+    let scoresDataBase = user.scores;
+
+    updateUserScore = scoresDataBase.push(req.body.scoreFromFront);
+
+    updateUserScore = await userModel.updateOne({ username: req.body.usernameFromFront }, { scores: scoresDataBase });
+
+    if (updateUserScore) {
+      result = true;
+      user = await userModel.findOne({ username: req.body.usernameFromFront }); //on refait une requête à la BDD pour envoyer au front le user mis à jour
+    } else {
+      error.push("le nouveau score n'a pas été enregistré");
+      res.json({ result, user, error });
+    }
+
+    //on attribue les trophées de notre database grâce à leurs Ids en fonction du score obtenu
+    if (req.body.scoreFromFront > 0 && req.body.scoreFromFront <= 50) {
+      trophyId = "5fd2390e0e2ad830d8b1fc22";
+    } else if (req.body.scoreFromFront > 50 && req.body.scoreFromFront <= 90) {
+      trophyId = "5fd238e40e2ad830d8b1fc21";
+    } else {
+      trophyId = "5fd2382e0e2ad830d8b1fc20";
+    }
+
+    //on fait une requête à la BDD pour trouver les trophées si le user en a déjà et pusher le nouveau
+    let trophiesDataBase = user.trophiesId;
+    updateUserTrophies = trophiesDataBase.push(trophyId);
+    updateUserTrophies = await userModel.updateOne(
+      { username: req.body.usernameFromFront },
+      { trophiesId: trophiesDataBase }
+    );
+
+    if (updateUserTrophies) {
+      result = true;
+      user = await userModel.findOne({ username: req.body.usernameFromFront }); //on refait une requête à la BDD pour envoyer au front le user mis à jour
+    } else {
+      error.push("le nouveau trophée n'a pas été enregistré");
+    }
+  } else {
+    error.push("username incorrect");
+  }
+
+  res.json({ result, user, error });
 });
 
 module.exports = router;
