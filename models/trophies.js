@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const trophySchema = mongoose.Schema({
   name: String,
-  image: String,
+  number: Number,
 });
 
 const trophyModel = mongoose.model("trophies", trophySchema);
