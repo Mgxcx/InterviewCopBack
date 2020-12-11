@@ -267,4 +267,33 @@ router.post("/interviewsave-scoreandtrophy", async function (req, res, next) {
   res.json({ result, user, error });
 });
 
+router.post("/interviewfind-lasttrophy", async function (req, res, next) {
+  let result = false;
+  let user = null;
+  let lastTrophyDataBase = null;
+  let lastTrophyToShow = null;
+  let error = [];
+
+  user = await userModel.findOne({ username: req.body.usernameFromFront });
+
+  if (user) {
+    //on fait une requête à la BDD pour trouver les trophées du user et récupérer le dernier gagné pour l'afficher au user dans sa page résultat du dernier entretien
+    let trophiesDataBase = user.trophiesId;
+    lastTrophyDataBase = trophiesDataBase[trophiesDataBase.length - 1];
+
+    lastTrophyToShow = await trophyModel.findById(lastTrophyDataBase);
+
+    if (lastTrophyToShow) {
+      result = true;
+    } else {
+      error.push("le nouveau trophée n'a pas été trouvé");
+      res.json({ result, user, error });
+    }
+  } else {
+    error.push("username incorrect");
+  }
+
+  res.json({ result, user, error, lastTrophyToShow });
+});
+
 module.exports = router;
