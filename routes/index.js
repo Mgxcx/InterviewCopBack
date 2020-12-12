@@ -300,7 +300,7 @@ router.post("/interviewfind-lasttrophy", async function (req, res, next) {
 });
 
 
-//data scraping du site keljob.com pour afficher un salaire moyen selon le métier et la région de l'utilisateur
+//réalise un scraping du site keljob.com pour afficher un salaire moyen selon le métier et la région de l'utilisateur
 router.get("/scrape-salary", async function (req, res, next) {
   let result = false;
   const error = [];
@@ -325,20 +325,19 @@ router.get("/scrape-salary", async function (req, res, next) {
   //mise en forme de la string "job" pour correspondre avec les url de keljob
   const job = req.query.job.toLowerCase();
 
-
   const data = await fetch(`https://www.keljob.com/recherche-salaire?q=${job}&l=${city}`);
   const $ = cheerio.load(await data.text());
-  const allTitles = $('.row .data')
+  const salary = $('.row .data')
     .get()
-    .map(repo => {
-      const $repo = $(repo);
-      const title = $repo.find('strong').text();
-      return title;
+    .map(e => {
+      const $e = $(e);
+      const salaryText = $e.find('strong').text();
+      return salaryText;
     });
 
-  if (allTitles[0]) {
+  if (salary[0]) {
     result = true;
-    res.json({ result, error, salary: allTitles[0] });
+    res.json({ result, error, salary: salary[0] });
   } else {
   error.push('Aucun salaire trouvé pour le métier et la région indiquée')
   res.json({ result, error });
