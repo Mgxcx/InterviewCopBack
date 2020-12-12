@@ -5,6 +5,9 @@ var uid2 = require("uid2");
 var SHA256 = require("crypto-js/sha256");
 var encBase64 = require("crypto-js/enc-base64");
 
+const cheerio = require('cheerio');
+const fetch = require('node-fetch');
+
 var userModel = require("../models/users");
 var questionModel = require("../models/questions");
 var trophyModel = require("../models/trophies");
@@ -295,5 +298,51 @@ router.post("/interviewfind-lasttrophy", async function (req, res, next) {
 
   res.json({ result, user, error, lastTrophyToShow });
 });
+
+
+//data scraping du site keljob.com pour afficher un salaire moyen selon le métier et la région de l'utilisateur
+router.get("/scrape-salary", async function (req, res, next) {
+  let result = false;
+  const error = [];
+
+  //ciblage sur les salaires pratiqués dans les grandes villes (pour obtenir des données de salaire significatives)
+  let city = "";
+  if (req.query.county === 'Hauts-de-France') {city = 'Lille'} 
+  else if (req.query.county === 'Normandie') {city = 'Rouen'}
+  else if (req.query.county === 'Ile-de-France') {city = 'Paris'}
+  else if (req.query.county === 'Grand Est') {city = 'Strasbourg'}
+  else if (req.query.county === 'Bretagne') {city = 'Rennes'}
+  else if (req.query.county === 'Pays de la Loire') {city = 'Nantes'}
+  else if (req.query.county === 'Centre-Val de Loire') {city = 'Orléans'}
+  else if (req.query.county === 'Bourgogne-Franche-Comte') {city = 'Dijon'}
+  else if (req.query.county === 'Nouvelle-Aquitaine') {city = 'Bordeaux'}
+  else if (req.query.county === 'Auvergne-Rhones-Alpes') {city = 'Lyon'}
+  else if (req.query.county === 'Occitanie') {city = 'Toulouse'}
+  else if (req.query.county === "Provences-Alpes-Cote d'Azur") {city = 'Marseille'}
+  else if (req.query.county === 'Corse') {city = 'Ajaccio'}
+  else {city = 'Fort-de-France'}// valeur pour l'input "Départements et régions d'outre-mer" venant du front
+
+  //mise en forme de la string "job" pour correspondre avec les url de keljob
+  const job = req.query.job.toLowerCase();
+
+
+  const data = await fetch(`https://www.keljob.com/recherche-salaire?q=${job}&l=${city}`);
+  const $ = cheerio.load(await data.text());
+  const allTitles = $('.row .data')
+    .get()
+    .map(repo => {
+      const $repo = $(repo);
+      const title = $repo.find('strong').text();
+      return title;
+    });
+
+  if (allTitles[0]) {
+    result = true;
+    res.json({ result, error, salary: allTitles[0] });
+  } else {
+  error.push('Aucun salaire trouvé pour le métier et la région indiquée')
+  res.json({ result, error });
+  }
+})
 
 module.exports = router;
