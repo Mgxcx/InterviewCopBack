@@ -11,7 +11,7 @@ const fetch = require("node-fetch");
 var userModel = require("../models/users");
 var questionModel = require("../models/questions");
 var trophyModel = require("../models/trophies");
-const adviceModel = require("../models/advice");
+const adviceModel = require("../models/advices");
 var packageModel = require("../models/packages");
 var icopModel = require("../models/icops");
 
@@ -405,7 +405,16 @@ router.get("/accountfind-informationdatabase", async function (req, res, next) {
 });
 
 router.get("/advices", async function (req, res, next) {
-  const advice = await adviceModel.find();
+  let result = false;
+  let advices = null;
+  let error = [];
+
+  advices = await adviceModel.find();
+  if (advices) {
+    result = true;
+    error.push("Aucun conseil n'a été trouvé")
+  }
+  res.json({result, advices, error})
 })
 
 module.exports = router;
