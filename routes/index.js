@@ -380,10 +380,10 @@ router.get("/accountfind-informationdatabase", async function (req, res, next) {
 
     if (scoresDataBase || trophiesDataBase || icopsDataBase || packageDataBase) {
       result = true;
-      if ((scoresDataBase = [])) {
+      if (scoresDataBase.length == 0) {
         error.push("Vous n'avez pas encore de scores!");
       }
-      if ((trophiesDataBase = [])) {
+      if (trophiesDataBase.length == 0) {
         error.push("Vous n'avez pas encore de trophées!");
       }
       if (!icopsDataBase) {
