@@ -5,13 +5,15 @@ var uid2 = require("uid2");
 var SHA256 = require("crypto-js/sha256");
 var encBase64 = require("crypto-js/enc-base64");
 
-const cheerio = require('cheerio');
-const fetch = require('node-fetch');
+const cheerio = require("cheerio");
+const fetch = require("node-fetch");
 
 var userModel = require("../models/users");
 var questionModel = require("../models/questions");
 var trophyModel = require("../models/trophies");
 const adviceModel = require("../models/advice");
+var packageModel = require("../models/packages");
+var icopModel = require("../models/icops");
 
 router.post("/sign-up", async function (req, res, next) {
   let error = [];
@@ -23,11 +25,11 @@ router.post("/sign-up", async function (req, res, next) {
   });
 
   if (data != null) {
-    error.push("utilisateur déjà présent");
+    error.push("Utilisateur déjà présent");
   }
 
   if (req.body.usernameFromFront == "" || req.body.passwordFromFront == "") {
-    error.push("champs vides");
+    error.push("Champs vides");
   }
 
   if (error.length == 0) {
@@ -38,6 +40,8 @@ router.post("/sign-up", async function (req, res, next) {
       salt: salt,
       secret_question: req.body.secret_question,
       secret_question_answer: req.body.secret_question_answer,
+      package: "5fd776ffe2b67bdc3438888b",
+      icopsId: ["5fcfb0f8693759e1b46eeabb"],
     });
 
     saveUser = await newUser.save();
@@ -56,7 +60,7 @@ router.post("/sign-in", async function (req, res, next) {
   let error = [];
 
   if (req.body.usernameFromFront == "" || req.body.passwordFromFront == "") {
-    error.push("champs vides");
+    error.push("Champs vides");
   }
 
   if (error.length == 0) {
@@ -70,10 +74,10 @@ router.post("/sign-in", async function (req, res, next) {
       if (passwordEncrypt == user.password) {
         result = true;
       } else {
-        error.push("mot de passe incorrect");
+        error.push("Mot de passe incorrect");
       }
     } else {
-      error.push("username incorrect");
+      error.push("Username incorrect");
     }
   }
   res.json({ result, user, error });
@@ -89,7 +93,7 @@ router.post("/password-recovery", async function (req, res, next) {
     req.body.secret_questionFromFront == "" ||
     req.body.secret_question_answerFromFront == ""
   ) {
-    error.push("champs vides");
+    error.push("Champs vides");
   }
 
   if (error.length == 0) {
@@ -102,7 +106,7 @@ router.post("/password-recovery", async function (req, res, next) {
     if (user) {
       result = true;
     } else {
-      error.push("champs incorrects");
+      error.push("Champs incorrects");
     }
   }
   res.json({ result, user, error });
@@ -114,7 +118,7 @@ router.post("/new-password", async function (req, res, next) {
   let error = [];
 
   if (req.body.newPasswordFromFront == "") {
-    error.push("champ vide");
+    error.push("Champ vide");
   }
 
   if (error.length == 0) {
@@ -127,7 +131,7 @@ router.post("/new-password", async function (req, res, next) {
       );
       result = true;
     } else {
-      error.push("le nouveau mot de passe n'a pas été enregistré");
+      error.push("Votre nouveau mot de passe n'a pas été enregistré");
     }
   }
 
@@ -140,13 +144,8 @@ router.post("/update-userdata", async function (req, res, next) {
   let updateUser = null;
   let error = [];
 
-  if (
-    req.body.jobFromFront == "" ||
-    req.body.experienceFromFront == "" ||
-    req.body.salaryFromFront == "" ||
-    req.body.countyFromFront == ""
-  ) {
-    error.push("erreur: un ou plusieurs champs sont vides");
+  if (req.body.jobFromFront == "" || req.body.salaryFromFront == "" || req.body.countyFromFront == "") {
+    error.push("Un ou plusieurs champs sont vides");
   }
 
   if (error.length == 0) {
@@ -157,7 +156,6 @@ router.post("/update-userdata", async function (req, res, next) {
         { username: req.body.usernameFromFront },
         {
           job: req.body.jobFromFront,
-          experience: req.body.experienceFromFront,
           salary: req.body.salaryFromFront,
           county: req.body.countyFromFront,
         }
@@ -167,7 +165,7 @@ router.post("/update-userdata", async function (req, res, next) {
         user = await userModel.findOne({ username: req.body.usernameFromFront }); //on refait une requête à la BDD pour envoyer au front le user mis à jour
       }
     } else {
-      error.push("erreur: l'enregistrement des données a échoué");
+      error.push("L'enregistrement des données a échoué");
     }
   }
 
@@ -198,11 +196,11 @@ router.get("/generate-questions", async function (req, res, next) {
 
   // message d'erreur si la génération de questions a totalement échouée
   if (!questionsArray || questionsArray.length === 0) {
-    error.push("erreur : aucune question n'a été générée");
+    error.push("Aucune question n'a été générée");
   }
   //message d'erreur si la génération de questions n'a fonctionné que partiellement
   if (questionsArray && questionsArray.length > 0 && questionsArray.length < 10) {
-    error.push("erreur: une ou plusieurs questions n'ont pas été générées");
+    error.push("Une ou plusieurs questions n'ont pas été générées");
   }
   if (questionsArray && questionsArray.length === 10) {
     result = true;
@@ -219,7 +217,7 @@ router.post("/interviewsave-scoreandtrophy", async function (req, res, next) {
   let error = [];
 
   if (req.body.scoreFromFront == "") {
-    error.push("pas de score");
+    error.push("Pas de nouveau score");
     res.json({ result, user, error });
   }
 
@@ -237,7 +235,7 @@ router.post("/interviewsave-scoreandtrophy", async function (req, res, next) {
       result = true;
       user = await userModel.findOne({ username: req.body.usernameFromFront }); //on refait une requête à la BDD pour envoyer au front le user mis à jour
     } else {
-      error.push("le nouveau score n'a pas été enregistré");
+      error.push("Votre nouveau score n'a pas été enregistré");
       res.json({ result, user, error });
     }
 
@@ -262,10 +260,10 @@ router.post("/interviewsave-scoreandtrophy", async function (req, res, next) {
       result = true;
       user = await userModel.findOne({ username: req.body.usernameFromFront }); //on refait une requête à la BDD pour envoyer au front le user mis à jour
     } else {
-      error.push("le nouveau trophée n'a pas été enregistré");
+      error.push("Votre nouveau trophée n'a pas été enregistré");
     }
   } else {
-    error.push("username incorrect");
+    error.push("Username incorrect");
   }
 
   res.json({ result, user, error });
@@ -290,16 +288,15 @@ router.post("/interviewfind-lasttrophy", async function (req, res, next) {
     if (lastTrophyToShow) {
       result = true;
     } else {
-      error.push("le nouveau trophée n'a pas été trouvé");
+      error.push("Votre nouveau trophée n'a pas été trouvé");
       res.json({ result, user, error });
     }
   } else {
-    error.push("username incorrect");
+    error.push("Username incorrect");
   }
 
   res.json({ result, user, error, lastTrophyToShow });
 });
-
 
 //réalise un scraping du site keljob.com pour afficher un salaire moyen selon le métier et la région de l'utilisateur
 router.get("/scrape-salary", async function (req, res, next) {
@@ -308,31 +305,46 @@ router.get("/scrape-salary", async function (req, res, next) {
 
   //ciblage sur les salaires pratiqués dans les grandes villes (pour obtenir des données de salaire significatives)
   let city = "";
-  if (req.query.county === 'Hauts-de-France') {city = 'Lille'} 
-  else if (req.query.county === 'Normandie') {city = 'Rouen'}
-  else if (req.query.county === 'Ile-de-France') {city = 'Paris'}
-  else if (req.query.county === 'Grand Est') {city = 'Strasbourg'}
-  else if (req.query.county === 'Bretagne') {city = 'Rennes'}
-  else if (req.query.county === 'Pays de la Loire') {city = 'Nantes'}
-  else if (req.query.county === 'Centre-Val de Loire') {city = 'Orléans'}
-  else if (req.query.county === 'Bourgogne-Franche-Comte') {city = 'Dijon'}
-  else if (req.query.county === 'Nouvelle-Aquitaine') {city = 'Bordeaux'}
-  else if (req.query.county === 'Auvergne-Rhones-Alpes') {city = 'Lyon'}
-  else if (req.query.county === 'Occitanie') {city = 'Toulouse'}
-  else if (req.query.county === "Provences-Alpes-Cote d'Azur") {city = 'Marseille'}
-  else if (req.query.county === 'Corse') {city = 'Ajaccio'}
-  else {city = 'Fort-de-France'}// valeur pour l'input "Départements et régions d'outre-mer" venant du front
+  if (req.query.county === "Hauts-de-France") {
+    city = "Lille";
+  } else if (req.query.county === "Normandie") {
+    city = "Rouen";
+  } else if (req.query.county === "Ile-de-France") {
+    city = "Paris";
+  } else if (req.query.county === "Grand Est") {
+    city = "Strasbourg";
+  } else if (req.query.county === "Bretagne") {
+    city = "Rennes";
+  } else if (req.query.county === "Pays de la Loire") {
+    city = "Nantes";
+  } else if (req.query.county === "Centre-Val de Loire") {
+    city = "Orléans";
+  } else if (req.query.county === "Bourgogne-Franche-Comte") {
+    city = "Dijon";
+  } else if (req.query.county === "Nouvelle-Aquitaine") {
+    city = "Bordeaux";
+  } else if (req.query.county === "Auvergne-Rhone-Alpes") {
+    city = "Lyon";
+  } else if (req.query.county === "Occitanie") {
+    city = "Toulouse";
+  } else if (req.query.county === "Provence-Alpes-Cote d'Azur") {
+    city = "Marseille";
+  } else if (req.query.county === "Corse") {
+    city = "Ajaccio";
+  } else {
+    city = "Fort-de-France";
+  } // valeur pour l'input "DOM-TOM" venant du front
 
   //mise en forme de la string "job" pour correspondre avec les url de keljob
   const job = req.query.job.toLowerCase();
 
   const data = await fetch(`https://www.keljob.com/recherche-salaire?q=${job}&l=${city}`);
   const $ = cheerio.load(await data.text());
-  const salary = $('.row .data')
+  const salary = $(".row .data")
     .get()
-    .map(e => {
+    .map((e) => {
       const $e = $(e);
-      const salaryText = $e.find('strong').text();
+      const salaryText = $e.find("strong").text();
       return salaryText;
     });
 
@@ -340,10 +352,57 @@ router.get("/scrape-salary", async function (req, res, next) {
     result = true;
     res.json({ result, error, salary: salary[0] });
   } else {
-  error.push('Aucun salaire trouvé pour le métier et la région indiquée')
-  res.json({ result, error });
+    error.push("Aucun salaire trouvé pour le métier et la région indiquée");
+    res.json({ result, error });
   }
-})
+});
+
+router.get("/accountfind-informationdatabase", async function (req, res, next) {
+  let result = false;
+  let user = null;
+  let scoresDataBase = null;
+  let trophiesDataBase = null;
+  let icopsDataBase = null;
+  let packageDataBase = null;
+  let error = [];
+
+  user = await userModel.findOne({ username: req.query.usernameFromFront });
+
+  if (user) {
+    //on fait une requête à la BDD pour trouver les scores, trophées, icops et package du user
+    // pour les afficher dans sa page Mon Compte
+    scoresDataBase = user.scores;
+    trophiesDataBase = user.trophiesId;
+    let icopsDataBaseId = user.icopsId;
+    let packageDataBaseId = user.package;
+
+    packageDataBase = await packageModel.findById(packageDataBaseId);
+    icopsDataBase = await icopModel.findById(icopsDataBaseId);
+
+    if (scoresDataBase || trophiesDataBase || icopsDataBase || packageDataBase) {
+      result = true;
+      if (scoresDataBase.length == 0) {
+        error.push("Vous n'avez pas encore de scores!");
+      }
+      if (trophiesDataBase.length == 0) {
+        error.push("Vous n'avez pas encore de trophées!");
+      }
+      if (!icopsDataBase) {
+        error.push("Vos icops n'ont pas été trouvés");
+      }
+      if (!packageDataBase) {
+        error.push("Votre package n'a pas été trouvé");
+      }
+    } else {
+      error.push("Vous n'avez pas encore de score, de trophée, d'icop ou de package");
+      res.json({ result, user, error });
+    }
+  } else {
+    error.push("Username incorrect");
+  }
+
+  res.json({ result, user, error, scoresDataBase, trophiesDataBase, icopsDataBase, packageDataBase });
+});
 
 router.get("/advices", async function (req, res, next) {
   const advice = await adviceModel.find();

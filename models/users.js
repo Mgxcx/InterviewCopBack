@@ -11,12 +11,11 @@ const userSchema = mongoose.Schema({
   secret_question: String, //question secrete pour la récupération du mot de passe
   secret_question_answer: String, //reponse a la question secrete pour la recupération du mot de passe
   job: String, //métier du user demande au début de l'entretien
-  experience: Number, //niveau d'expérience (en nombre d'années) demandé au début de l'entretien
   salary: Number, //pretentions salariales du user demandées au debut de l'entretien
   county: String, //region du user demandée au debut de l'entretien
   trophiesId: [{ type: mongoose.Schema.Types.ObjectId, ref: "trophies" }], //liste des trophées gagnés par le user
-  package: { type: mongoose.Schema.Types.ObjectId, ref: "package" }, //formule choisie par le user
-  icopsId: [{ type: mongoose.Schema.Types.ObjectId, ref: "icop" }], //liste des icops détenus par le user
+  package: { type: mongoose.Schema.Types.ObjectId, ref: "packages" }, //formule choisie par le user
+  icopsId: [{ type: mongoose.Schema.Types.ObjectId, ref: "icops" }], //liste des icops détenus par le user
   chat_messages: [chatSchema], //historique des chats du user
   scores: Array, //historique des scores
 });
