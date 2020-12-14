@@ -371,12 +371,13 @@ router.get("/accountfind-informationdatabase", async function (req, res, next) {
     //on fait une requête à la BDD pour trouver les scores, trophées, icops et package du user
     // pour les afficher dans sa page Mon Compte
     scoresDataBase = user.scores;
-    trophiesDataBase = user.trophiesId;
+    let trophiesDataBaseId = user.trophiesId;
     let icopsDataBaseId = user.icopsId;
     let packageDataBaseId = user.package;
 
     packageDataBase = await packageModel.findById(packageDataBaseId);
     icopsDataBase = await icopModel.findById(icopsDataBaseId);
+    trophiesDataBase = await trophyModel.findById(trophiesDataBaseId);
 
     if (scoresDataBase || trophiesDataBase || icopsDataBase || packageDataBase) {
       result = true;
