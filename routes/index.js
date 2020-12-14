@@ -372,13 +372,22 @@ router.get("/accountfind-informationdatabase", async function (req, res, next) {
     //on fait une requête à la BDD pour trouver les scores, trophées, icops et package du user
     // pour les afficher dans sa page Mon Compte
     scoresDataBase = user.scores;
-    let trophiesDataBaseId = user.trophiesId;
-    let icopsDataBaseId = user.icopsId;
     let packageDataBaseId = user.package;
-
     packageDataBase = await packageModel.findById(packageDataBaseId);
-    icopsDataBase = await icopModel.findById(icopsDataBaseId);
-    trophiesDataBase = await trophyModel.findById(trophiesDataBaseId);
+
+    //on fait un map pour faire la requête à la BDD car il peut y avoir plusieurs trophies
+    let trophiesDataBaseId = user.trophiesId;
+    const trophiesPromise = trophiesDataBaseId.map(async (trophy) => {
+      return await trophyModel.findById(trophy);
+    });
+    trophiesDataBase = await Promise.all(trophiesPromise); //le Promise.all permet de résoudre les promesses
+
+    //on fait un map pour faire la requête à la BDD car il peut y avoir plusieurs icops
+    let icopsDataBaseId = user.icopsId;
+    const icopsPromise = icopsDataBaseId.map(async (icop) => {
+      return await icopModel.findById(icop);
+    });
+    icopsDataBase = await Promise.all(icopsPromise); //le Promise.all permet de résoudre les promesses
 
     if (scoresDataBase || trophiesDataBase || icopsDataBase || packageDataBase) {
       result = true;
