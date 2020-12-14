@@ -5,6 +5,6 @@ const adviceSchema = mongoose.Schema({
     content: String
 })
 
-const adviceModel = mongoose.model('advice', adviceSchema)
+const adviceModel = mongoose.model('advices', adviceSchema)
 
 module.exports = adviceModel

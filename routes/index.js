@@ -11,6 +11,7 @@ const fetch = require('node-fetch');
 var userModel = require("../models/users");
 var questionModel = require("../models/questions");
 var trophyModel = require("../models/trophies");
+const adviceModel = require("../models/advice");
 
 router.post("/sign-up", async function (req, res, next) {
   let error = [];
@@ -342,6 +343,10 @@ router.get("/scrape-salary", async function (req, res, next) {
   error.push('Aucun salaire trouvé pour le métier et la région indiquée')
   res.json({ result, error });
   }
+})
+
+router.get("/advices", async function (req, res, next) {
+  const advice = await adviceModel.find();
 })
 
 module.exports = router;
