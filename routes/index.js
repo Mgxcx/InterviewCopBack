@@ -141,7 +141,6 @@ router.post("/update-userdata", async function (req, res, next) {
 
   if (
     req.body.jobFromFront == "" ||
-    req.body.experienceFromFront == "" ||
     req.body.salaryFromFront == "" ||
     req.body.countyFromFront == ""
   ) {
@@ -156,7 +155,6 @@ router.post("/update-userdata", async function (req, res, next) {
         { username: req.body.usernameFromFront },
         {
           job: req.body.jobFromFront,
-          experience: req.body.experienceFromFront,
           salary: req.body.salaryFromFront,
           county: req.body.countyFromFront,
         }
@@ -316,11 +314,11 @@ router.get("/scrape-salary", async function (req, res, next) {
   else if (req.query.county === 'Centre-Val de Loire') {city = 'Orléans'}
   else if (req.query.county === 'Bourgogne-Franche-Comte') {city = 'Dijon'}
   else if (req.query.county === 'Nouvelle-Aquitaine') {city = 'Bordeaux'}
-  else if (req.query.county === 'Auvergne-Rhones-Alpes') {city = 'Lyon'}
+  else if (req.query.county === 'Auvergne-Rhone-Alpes') {city = 'Lyon'}
   else if (req.query.county === 'Occitanie') {city = 'Toulouse'}
-  else if (req.query.county === "Provences-Alpes-Cote d'Azur") {city = 'Marseille'}
+  else if (req.query.county === "Provence-Alpes-Cote d'Azur") {city = 'Marseille'}
   else if (req.query.county === 'Corse') {city = 'Ajaccio'}
-  else {city = 'Fort-de-France'}// valeur pour l'input "Départements et régions d'outre-mer" venant du front
+  else {city = 'Fort-de-France'}// valeur pour l'input "DOM-TOM" venant du front
 
   //mise en forme de la string "job" pour correspondre avec les url de keljob
   const job = req.query.job.toLowerCase();
