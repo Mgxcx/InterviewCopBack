@@ -365,6 +365,10 @@ router.get("/accountfind-informationdatabase", async function (req, res, next) {
   let icopsDataBase = null;
   let packageDataBase = null;
   let error = [];
+  let errorscores = [];
+  let errortrophies = [];
+  let erroricops = [];
+  let errorpackage = [];
 
   user = await userModel.findOne({ username: req.query.usernameFromFront });
 
@@ -392,16 +396,16 @@ router.get("/accountfind-informationdatabase", async function (req, res, next) {
     if (scoresDataBase || trophiesDataBase || icopsDataBase || packageDataBase) {
       result = true;
       if (scoresDataBase.length == 0) {
-        error.push("Vous n'avez pas encore de scores!");
+        errorscores.push("Vous n'avez pas encore de scores!");
       }
       if (trophiesDataBase.length == 0) {
-        error.push("Vous n'avez pas encore de trophées!");
+        errortrophies.push("Vous n'avez pas encore de trophées!");
       }
       if (!icopsDataBase) {
-        error.push("Vos icops n'ont pas été trouvés");
+        erroricops.push("Vos icops n'ont pas été trouvés");
       }
       if (!packageDataBase) {
-        error.push("Votre package n'a pas été trouvé");
+        errorpackage.push("Votre package n'a pas été trouvé");
       }
     } else {
       error.push("Vous n'avez pas encore de score, de trophée, d'icop ou de package");
@@ -411,7 +415,19 @@ router.get("/accountfind-informationdatabase", async function (req, res, next) {
     error.push("Username incorrect");
   }
 
-  res.json({ result, user, error, scoresDataBase, trophiesDataBase, icopsDataBase, packageDataBase });
+  res.json({
+    result,
+    user,
+    error,
+    errorscores,
+    errortrophies,
+    erroricops,
+    errorpackage,
+    scoresDataBase,
+    trophiesDataBase,
+    icopsDataBase,
+    packageDataBase,
+  });
 });
 
 router.get("/advices", async function (req, res, next) {
@@ -422,9 +438,9 @@ router.get("/advices", async function (req, res, next) {
   advices = await adviceModel.find();
   if (advices) {
     result = true;
-    error.push("Aucun conseil n'a été trouvé")
+    error.push("Aucun conseil n'a été trouvé");
   }
-  res.json({result, advices, error})
-})
+  res.json({ result, advices, error });
+});
 
 module.exports = router;
