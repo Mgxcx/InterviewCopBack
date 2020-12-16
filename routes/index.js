@@ -443,4 +443,31 @@ router.get("/advices", async function (req, res, next) {
   res.json({ result, advices, error });
 });
 
+router.get("/shopfind-package", async function (req, res, next) {
+  let result = false;
+  let user = null;
+  let packageDataBase = null;
+  let error = [];
+
+  user = await userModel.findOne({ username: req.query.usernameFromFront });
+
+  if (user) {
+    //on fait une requête à la BDD pour trouver le package du user
+    // pour l'afficher dans sa page Shop
+    let packageDataBaseId = user.package;
+    packageDataBase = await packageModel.findById(packageDataBaseId);
+
+    if (packageDataBase) {
+      result = true;
+    } else {
+      error.push("Vous n'avez pas de package");
+      res.json({ result, user, error });
+    }
+  } else {
+    error.push("Username incorrect");
+  }
+
+  res.json({ result, user, error, packageDataBase });
+});
+
 module.exports = router;
