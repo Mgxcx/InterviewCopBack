@@ -470,4 +470,49 @@ router.get("/shopfind-package", async function (req, res, next) {
   res.json({ result, user, error, packageDataBase });
 });
 
+router.get("/shopupdate-package", async function (req, res, next) {
+  let result = false;
+  let user = null;
+  let userUpdate = null;
+  let userUpdated = null;
+  let packageDataBase = null;
+  let packageDataBaseId = null;
+  let error = [];
+
+  user = await userModel.findOne({ username: req.query.usernameFromFront });
+
+  if (user) {
+    //on fait une requête à la BDD pour remplacer le package du user s'il a cliqué sur le bouton "Je la veux"
+    // en dessous d'une formule et que le paiement s'est bien passé dans la page Shop
+    userUpdate = await userModel.updateOne(
+      { username: req.query.usernameFromFront },
+      { package: req.query.packageIdFromFront }
+    );
+
+    if (userUpdate) {
+      userUpdated = await userModel.findOne({
+        username: req.query.usernameFromFront,
+        package: req.query.packageIdFromFront,
+      }); //on refait une requête à la BDD pour envoyer au front le user mis à jour
+      packageDataBaseId = userUpdated.package;
+      packageDataBase = await packageModel.findById(packageDataBaseId);
+
+      if (packageDataBase) {
+        result = true;
+        res.json({ result, user, packageDataBase });
+      } else {
+        error.push("Votre package n'a pas été trouvé");
+        res.json({ result, user, error });
+      }
+    } else {
+      error.push("Votre package n'a pas été mis à jour");
+      res.json({ result, user, error });
+    }
+  } else {
+    error.push("Username incorrect");
+  }
+
+  res.json({ result, user, error });
+});
+
 module.exports = router;
