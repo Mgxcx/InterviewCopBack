@@ -21,6 +21,21 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
+var io = require('socket.io')(server);
+io.on('connection', function(socket){
+  // console.log('a user connected');
+  socket.on('sendWelcomeMessage', function(message) {
+    io.emit('welcomeMessage', {currentMessage: `Bonjour ${message.username.username}, que puis-je faire pour vous? :)`, username: 'Mike Chicken'});
+  });
+  socket.on('sendMessage', function(message) {
+    io.emit('sendMessageToAll', message);
+    //Réponse automatique déclenchée 1 seconde après le message de l'utilisateur
+    var delayInMilliseconds = 1000; 
+    setTimeout(function() {
+      io.emit('sendMessageToAll', {currentMessage:`Merci ${message.username}, c'est noté! Votre coach vous répondra prochainement. En attendant, vous pouvez toujours vous entraîner aux entretiens!`, username:'Mike Chicken'});
+    }, delayInMilliseconds);
+  });
+});
 /**
  * Listen on provided port, on all network interfaces.
  */
