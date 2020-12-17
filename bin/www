@@ -25,7 +25,6 @@ var io = require("socket.io")(server);
 io.on("connection", function (socket) {
   // console.log('a user connected');
   socket.on("sendWelcomeMessage", function (message) {
-    console.log(message);
     io.emit("welcomeMessage", {
       currentMessage: `Bonjour ${message.username}, que puis-je faire pour vous? :)`,
       username: "Mike Chicken",
