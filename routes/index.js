@@ -41,7 +41,7 @@ router.post("/sign-up", async function (req, res, next) {
       secret_question: req.body.secret_question,
       secret_question_answer: req.body.secret_question_answer,
       package: "5fd776ffe2b67bdc3438888b",
-      icopsId: ["5fcfb0f8693759e1b46eeabb"],
+      icopsId: ["5fcfb0f8693759e1b46eeabb", "5fcfb151693759e1b46eeabc"],
     });
 
     saveUser = await newUser.save();
@@ -186,15 +186,16 @@ router.get("/generate-questions", async function (req, res, next) {
   //recherche des questions dans la BDD (à partir des numéros aléatoires d'indexList et de l'icop choisi) et ajout dans un tableau à envoyer au front
   let result = false;
   const error = [];
-  let icopID = '5fcfb0f8693759e1b46eeabb';//ID de Mike Chicken (par défaut)
-  if (req.query.icop === 'AgentTouf') {
+  let icopID = "5fcfb0f8693759e1b46eeabb"; //ID de Mike Chicken (par défaut)
+  if (req.query.icop === "AgentTouf") {
     icopID = "5fcfb151693759e1b46eeabc";
   }
 
   const questionsPromise = indexList.map(async (questionNumber) => {
-    return await questionModel.findOne({      //le fait d'avoir des fonctions asynchrones dans un .map génère des Promise
+    return await questionModel.findOne({
+      //le fait d'avoir des fonctions asynchrones dans un .map génère des Promise
       index: questionNumber,
-      linked_icop: icopID
+      linked_icop: icopID,
     });
   });
   const questionsArray = await Promise.all(questionsPromise); //le Promise.all permet de résoudre les promesses
