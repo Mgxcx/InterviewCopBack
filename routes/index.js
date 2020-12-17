@@ -176,20 +176,25 @@ router.get("/generate-questions", async function (req, res, next) {
   //randomization des numéros de questions
   const indexList = [];
   while (indexList.length < 10) {
-    randomNumber = Math.ceil(Math.random() * 17);
+    randomNumber = Math.ceil(Math.random() * 14);
     const alreadyExists = indexList.find((e) => e === randomNumber);
     if (!alreadyExists) {
       indexList.push(randomNumber);
     }
   }
 
-  //recherche des questions dans la BDD (à partir des numéros aléatoires d'indexList) et ajout dans un tableau à envoyer au front
+  //recherche des questions dans la BDD (à partir des numéros aléatoires d'indexList et de l'icop choisi) et ajout dans un tableau à envoyer au front
   let result = false;
   const error = [];
+  let icopID = '5fcfb0f8693759e1b46eeabb';//ID de Mike Chicken (par défaut)
+  if (req.query.icop === 'AgentTouf') {
+    icopID = "5fcfb151693759e1b46eeabc";
+  }
+
   const questionsPromise = indexList.map(async (questionNumber) => {
-    return await questionModel.findOne({
-      //le fait d'avoir des fonctions asynchrones dans un .map génère des Promise
+    return await questionModel.findOne({      //le fait d'avoir des fonctions asynchrones dans un .map génère des Promise
       index: questionNumber,
+      linked_icop: icopID
     });
   });
   const questionsArray = await Promise.all(questionsPromise); //le Promise.all permet de résoudre les promesses
