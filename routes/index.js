@@ -275,14 +275,14 @@ router.post("/interviewsave-scoreandtrophy", async function (req, res, next) {
   res.json({ result, user, error });
 });
 
-router.post("/interviewfind-lasttrophy", async function (req, res, next) {
+router.get("/interviewfind-lasttrophy", async function (req, res, next) {
   let result = false;
   let user = null;
   let lastTrophyDataBase = null;
   let lastTrophyToShow = null;
   let error = [];
 
-  user = await userModel.findOne({ username: req.body.usernameFromFront });
+  user = await userModel.findOne({ username: req.query.usernameFromFront });
 
   if (user) {
     //on fait une requête à la BDD pour trouver les trophées du user et récupérer le dernier gagné pour l'afficher au user dans sa page résultat du dernier entretien
