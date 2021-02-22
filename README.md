@@ -7,6 +7,10 @@ J'ai été heureuse de rendre son idée d'appli concrète avec lui.
 Nous avons formé un bon binôme complémentaire, et nous nous sommes bien répartis les tâches pour être 100% fullstack tous les deux! 
 
 
+![alt text](https://j.gifs.com/lxzyA7.gif) 
+
+https://youtu.be/wdc-lx7tumAhttps://youtu.be/wdc-lx7tumA
+
 ![alt text](https://res.cloudinary.com/drchl4shw/image/upload/v1613844239/InterviewCop1_ctfl3g.png)
 ![alt text](https://res.cloudinary.com/drchl4shw/image/upload/v1613844239/InterviewCop2_gfq8ld.png)
 ![alt text](https://res.cloudinary.com/drchl4shw/image/upload/v1613844239/InterviewCop3_rmht3l.png)
